@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import './App.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 
 const DEFAULT_QUERY = 'redux';
 const DEFAULT_HPP = '100';
@@ -46,6 +48,7 @@ class App extends Component {
       searchKey: '',
       searchTerm: DEFAULT_QUERY,
       error: null,
+      isLoading: false,
     };
 
     this.needsToSearchTopStories = this.needsToSearchTopStories.bind(this);
@@ -77,11 +80,14 @@ class App extends Component {
       results: {
         ...results,
         [searchKey]: {hits: updatedHits, page}
-      }
+      },
+      isLoading: false
     });
   }
 
   fetchSearchTopStories(searchTerm, page = 0){
+    this.setState({ isLoading: true });
+
     axios(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`)
       .then(result => this.setSearchTopStories(result.data))
       .catch(error => this.setState({error}));
@@ -128,7 +134,8 @@ class App extends Component {
       searchTerm, 
       results,
       searchKey,
-      error
+      error,
+      isLoading
     } = this.state;
 
     const page = (
@@ -164,9 +171,14 @@ class App extends Component {
             />
         }
         <div className="interactions">
-          <Button onClick={() => this.fetchSearchTopStories(searchKey, page + 1)}>
-            More
-          </Button>
+          { isLoading
+             ? <Loading />
+             : <Button 
+                  onClick={() => this.fetchSearchTopStories(searchKey, page + 1)}
+               >
+               More
+            </Button>
+          }
         </div>
       </div>
     );
@@ -285,6 +297,10 @@ Button.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
+const Loading = () =>
+  <div>
+    <FontAwesomeIcon icon={faSpinner} />
+  </div>
 
 export default App;
 

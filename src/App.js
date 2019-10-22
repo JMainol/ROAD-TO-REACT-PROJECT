@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import './App.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 
 const DEFAULT_QUERY = 'redux';
 const DEFAULT_HPP = '100';
@@ -171,14 +171,12 @@ class App extends Component {
             />
         }
         <div className="interactions">
-          { isLoading
-             ? <Loading />
-             : <Button 
-                  onClick={() => this.fetchSearchTopStories(searchKey, page + 1)}
-               >
-               More
-            </Button>
-          }
+          <ButtonWithLoading
+            isLoading={isLoading}
+            onClick={() => this.fetchSearchTopStories(searchKey, page + 1)}
+          >
+            More
+          </ButtonWithLoading>
         </div>
       </div>
     );
@@ -276,7 +274,7 @@ const Table = ({list, onDismiss}) =>
 
 const Button = ({
   onClick, 
-  className,
+  className= '',
   children,
 }) => 
       <button
@@ -287,9 +285,15 @@ const Button = ({
         {children}
       </button>
 
-Button.defaultProps = {
-  className: '',
-};
+const Loading = () =>
+  <div>Loading ...</div>
+
+const withLoading = (Component) => ({ isLoading, ...rest }) =>
+  isLoading
+    ? <Loading />
+    : <Component { ...rest} />
+
+const ButtonWithLoading = withLoading(Button);
 
 Button.propTypes = {
   onClick: PropTypes.func.isRequired,
@@ -297,10 +301,10 @@ Button.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-const Loading = () =>
-  <div>
-    <FontAwesomeIcon icon={faSpinner} />
-  </div>
+// const Loading = () =>
+//   <div>
+//     <FontAwesomeIcon icon={faSpinner} />
+//   </div>
 
 export default App;
 
